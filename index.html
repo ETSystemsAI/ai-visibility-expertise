@@ -1,148 +1,553 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Visibility Audit | Экспертный аудит видимости в ChatGPT и Claude</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Visibility Audit — Аудит видимости в ChatGPT и Claude</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        body { background: #f8fafc; }
+        .shadow-card { box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+        .shadow-card:hover { box-shadow: 0 8px 40px rgba(0,0,0,0.10); transition: 0.3s; }
+        .gradient-hero {
+            background: linear-gradient(135deg, #0b1a33 0%, #1a2f4f 50%, #0b1a33 100%);
+        }
+        .gradient-cta {
+            background: linear-gradient(135deg, #1e4b8a 0%, #2563eb 100%);
+        }
+        .gradient-cta:hover {
+            background: linear-gradient(135deg, #1a3f73 0%, #1d4ed8 100%);
+            transform: scale(1.02);
+            transition: 0.3s;
+        }
+        .badge {
+            background: rgba(37, 99, 235, 0.10);
+            color: #2563eb;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            display: inline-block;
+        }
+        .price-tag {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #1e293b;
+            line-height: 1;
+        }
+        .price-tag span {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #64748b;
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.75rem; }
+            .price-tag { font-size: 2.25rem; }
+        }
+        .table-wrap { overflow-x: auto; }
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .table-wrap th {
+            background: #f1f5f9;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .table-wrap td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+        .table-wrap tr:hover td { background: #f8fafc; }
+        .check-green { color: #16a34a; font-weight: 700; }
+        .cross-red { color: #dc2626; font-weight: 700; }
+        .neutral-gray { color: #94a3b8; font-weight: 700; }
+        .association-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .association-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #e2e8f0;
+        }
+        .association-card h4 {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .association-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.875rem;
+            color: #334155;
+        }
+        .association-card ul li::before {
+            content: "✓ ";
+            color: #2563eb;
+            font-weight: 700;
+        }
+        .hallucination-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem 2rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        @media (max-width: 640px) {
+            .hallucination-row {
+                grid-template-columns: 1fr;
+                gap: 0.25rem;
+            }
+        }
+        .hallucination-row .ai-says {
+            color: #dc2626;
+            font-weight: 600;
+        }
+        .hallucination-row .reality {
+            color: #16a34a;
+            font-weight: 600;
+        }
+        .hallucination-row .label {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .footer-link {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+        .footer-link:hover { color: #cbd5e1; }
+        .pillar-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-900 font-sans">
+<body>
 
-    <!-- Hero Section -->
-    <header class="py-16 px-6 max-w-5xl mx-auto text-center">
-        <span class="text-blue-600 font-semibold tracking-wide uppercase text-sm">Новая реальность 2026</span>
-        <h1 class="text-4xl md:text-6xl font-bold mt-4 leading-tight">Ваш бизнес виден для <span class="text-blue-600">AI-систем</span>?</h1>
-        <p class="text-xl text-slate-600 mt-6 max-w-2xl mx-auto">
-            65% компаний ищут будущих партнеров и софт через ChatGPT и Claude. Если AI вас не рекомендует — вы теряете 2/3 рынка еще до первого касания.
+<!-- ===== HERO ===== -->
+<header class="gradient-hero text-white py-16 px-6">
+    <div class="max-w-5xl mx-auto text-center">
+        <div class="mb-4">
+            <span class="badge bg-white/10 text-white border border-white/20">
+                Generative AI Visibility Audit
+            </span>
+        </div>
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
+            Ваш бренд попадает в рекомендации<br />
+            <span class="text-blue-300">ChatGPT и Claude?</span>
+        </h1>
+        <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto mb-8">
+            Проверяем, как генеративные AI-системы воспринимают вашу компанию,
+            продукты и конкурентов. 15–20 страниц аналитики, 10+ сценариев,
+            сравнение с конкурентами — за <span class="text-white font-bold">99€</span>.
         </p>
-        <div class="mt-10">
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=e.kate.taratuta@gmail.com&su=AI%20Visibility%20Audit%20Request" 
-               target="_blank" 
-               class="bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition shadow-lg">
-                Заказать аудит за 99€
-            </a>
-        </div>
-    </header>
-
-    <!-- Problem Section -->
-    <section class="bg-white py-16 px-6 border-y">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold text-center">Почему это важно именно сейчас?</h2>
-            <div class="grid md:grid-cols-2 gap-10 mt-12">
-                <div class="p-6 border rounded-xl">
-                    <h3 class="font-bold text-xl mb-3 text-blue-600">Точка бифуркации</h3>
-                    <p class="text-slate-600 text-sm">В 2026 году рынок делится на «видимых» и «невидимых» для AI. Быть в списке рекомендаций нейросетей — это новый стандарт выживания бизнеса.</p>
-                </div>
-                <div class="p-6 border rounded-xl">
-                    <h3 class="font-bold text-xl mb-3 text-blue-600">Информационный вакуум</h3>
-                    <p class="text-slate-600 text-sm">Отсутствие упоминаний или ошибки AI о вашем продукте напрямую бьют по доверию. Если AI «галлюцинирует», вы теряете контроль над репутацией.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Case Study: Firm NNNNN -->
-    <section class="py-16 px-6 bg-slate-100">
-        <div class="max-w-5xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold">Кейс: Как AI видит «Фирму NNNNN»</h2>
-                <p class="text-slate-600 mt-2 italic">Реальный пример ручного аудита за 99€</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 items-center bg-white p-8 rounded-3xl shadow-lg border border-slate-200">
-                <div class="text-center md:border-r border-slate-100 pr-8">
-                    <div class="inline-block p-6 rounded-full bg-red-50 border-4 border-red-100 mb-4">
-                        <span class="text-5xl font-black text-red-600">33<span class="text-2xl">/100</span></span>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-900">AI Visibility Score</h3>
-                    <p class="text-sm text-slate-500 mt-2 italic">«Известный продукт, но невидимая категория»</p>
-                    
-                    <div class="mt-6 space-y-3 text-left">
-                        <div class="flex justify-between text-sm border-b pb-2">
-                            <span>Узнаваемость бренда:</span>
-                            <span class="font-bold text-green-600">60/100</span>
-                        </div>
-                        <div class="flex justify-between text-sm border-b pb-2">
-                            <span>Видимость в категории:</span>
-                            <span class="font-bold text-red-600">0/100</span>
-                        </div>
-                        <div class="flex justify-between text-sm">
-                            <span>Современность образа:</span>
-                            <span class="font-bold text-orange-500">35/100</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="font-bold text-blue-600 flex items-center">
-                            <span class="mr-2">🚨</span> Главная угроза
-                        </h4>
-                        <p class="text-sm text-slate-700 mt-1">
-                            Бренд отсутствовал в 100% категорийных запросов (например, «лучший софт для бизнеса»). AI последовательно уводил клиентов к конкурентам.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="font-bold text-blue-600 flex items-center">
-                            <span class="mr-2">❌</span> Галлюцинации AI
-                        </h4>
-                        <p class="text-sm text-slate-700 mt-1">
-                            ChatGPT ошибочно приписывал продукту отсутствующие функции (например, интеграцию с PayPal), создавая ложные ожидания у клиентов.
-                        </p>
-                    </div>
-                    <div class="bg-blue-50 p-4 rounded-xl">
-                        <p class="text-xs font-bold text-blue-800 uppercase mb-1">Результат аудита:</p>
-                        <p class="text-sm text-blue-900">
-                            Разработан <b>Action Plan</b>: 4 шаблона контента для изменения «нарратива» AI с «традиционного» на «современное ERP-решение».
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services -->
-    <section class="py-16 px-6 max-w-5xl mx-auto">
-        <h2 class="text-3xl font-bold text-center mb-12">Что вы получите за 99€?</h2>
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="bg-white p-8 rounded-2xl shadow-sm border">
-                <div class="text-3xl mb-4">🔍</div>
-                <h3 class="font-bold mb-2 text-lg">10 Тест-драйвов</h3>
-                <p class="text-sm text-slate-600">Ручная проверка 10 реальных сценариев ваших клиентов в изолированных сессиях ChatGPT и Claude.</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-sm border">
-                <div class="text-3xl mb-4">📊</div>
-                <h3 class="font-bold mb-2 text-lg">AI Visibility Score</h3>
-                <p class="text-sm text-slate-600">Точный индекс вашей видимости в нише и глубокое сравнение с вашими главными конкурентами.</p>
-            </div>
-            <div class="bg-white p-8 rounded-2xl shadow-sm border">
-                <div class="text-3xl mb-4">🚀</div>
-                <h3 class="font-bold mb-2 text-lg">Action Plan</h3>
-                <p class="text-sm text-slate-600">Конкретные рекомендации по исправлению «галлюцинаций» и шаблоны текстов, которые заставят AI рекомендовать вас.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer id="order" class="bg-slate-900 text-white py-20 px-6 text-center border-t border-slate-800">
-        <h2 class="text-3xl font-bold mb-4">Готовы стать заметными для AI?</h2>
-        <p class="mb-10 text-slate-400">Срок выполнения — 48 часов. Ручная работа экспертного уровня от Ph.D. инженера.</p>
-        <div class="mb-12">
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=e.kate.taratuta@gmail.com&su=AI%20Visibility%20Audit%20Inquiry" 
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=e.kate.taratuta@gmail.com&su=AI%20Visibility%20Audit%20Request"
                target="_blank"
-               class="inline-block bg-white text-slate-900 px-10 py-4 rounded-lg text-xl font-bold hover:bg-slate-200 transition">
-                e.kate.taratuta@gmail.com
+               class="gradient-cta text-white px-8 py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transition-all inline-block">
+                Получить AI Visibility Audit за 99€
             </a>
+            <span class="text-sm text-slate-400 hidden sm:inline">· 48 часов</span>
         </div>
-        <div class="text-slate-400 text-sm leading-relaxed">
-            <p class="font-semibold text-white text-lg">Ekaterina Taratuta</p>
-            <p>Ph.D., Founding ML & Systems Engineer · ETSystemsAI</p>
-            <p>Master of Computer Science in ML Engineering</p>
-            <div class="mt-4 flex justify-center gap-4 underline">
-                <a href="https://linkedin.com/in/ekaterina-taratuta" target="_blank">linkedin.com/in/ekaterina-taratuta</a>
+        <p class="text-sm text-slate-400 mt-4">
+            Ручная работа эксперта · Без автоматической генерации
+        </p>
+    </div>
+</header>
+
+<!-- ===== КОРОТКО О ЦЕННОСТИ ===== -->
+<section class="py-16 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-4xl mb-2">🧠</div>
+                <h3 class="font-bold text-lg">Что AI думает о вас</h3>
+                <p class="text-sm text-slate-600">Рекомендует, игнорирует или искажает?</p>
+            </div>
+            <div>
+                <div class="text-4xl mb-2">🏆</div>
+                <h3 class="font-bold text-lg">Кто получает клиентов</h3>
+                <p class="text-sm text-slate-600">Каких конкурентов AI называет вместо вас</p>
+            </div>
+            <div>
+                <div class="text-4xl mb-2">🛡️</div>
+                <h3 class="font-bold text-lg">Галлюцинации AI</h3>
+                <p class="text-sm text-slate-600">Какие ошибки и неточности AI распространяет о вас</p>
             </div>
         </div>
-    </footer>
+    </div>
+</section>
+
+<!-- ===== ЧТО ВХОДИТ В ОТЧЁТ ===== -->
+<section class="py-16 px-6 bg-slate-50">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">Что входит в отчёт</h2>
+        <p class="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+            Не просто диагностика, а полноценное исследование того,
+            как AI воспринимает ваш бренд, продукт и конкурентов.
+        </p>
+        <div class="grid md:grid-cols-2 gap-8">
+            <div class="bg-white p-8 rounded-2xl shadow-card border border-slate-100">
+                <h3 class="font-bold text-xl text-blue-600 mb-4">Основная аналитика</h3>
+                <ul class="space-y-3 text-sm text-slate-700">
+                    <li>✓ Executive Summary и AI Visibility Score</li>
+                    <li>✓ AI Brand Scorecard по 6 измерениям</li>
+                    <li>✓ Сравнение с 3–4 конкурентами</li>
+                    <li>✓ Карта AI-ассоциаций бренда</li>
+                    <li>✓ Hallucination Audit</li>
+                    <li>✓ Action Plan на 30–60 дней</li>
+                </ul>
+            </div>
+            <div class="bg-white p-8 rounded-2xl shadow-card border border-slate-100">
+                <h3 class="font-bold text-xl text-blue-600 mb-4">Доказательная база</h3>
+                <ul class="space-y-3 text-sm text-slate-700">
+                    <li>✓ Полные ответы ChatGPT и Claude</li>
+                    <li>✓ Все протестированные запросы</li>
+                    <li>✓ Скриншоты сессий</li>
+                    <li>✓ Список найденных ошибок AI</li>
+                    <li>✓ Карта конкурентов</li>
+                    <li>✓ Приоритетные рекомендации</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== AI BRAND SCORECARD ===== -->
+<section class="py-16 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">AI Brand Scorecard</h2>
+        <p class="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+            Мы оцениваем бренд по шести ключевым параметрам,
+            которые влияют на попадание в рекомендации AI.
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">🔍</div>
+                <h3 class="font-bold">Узнаваемость</h3>
+                <p class="text-sm text-slate-600">Знает ли AI ваш бренд вообще?</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">📂</div>
+                <h3 class="font-bold">Категорийная видимость</h3>
+                <p class="text-sm text-slate-600">Попадаете ли в рекомендации без упоминания названия?</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">🤝</div>
+                <h3 class="font-bold">Доверие</h3>
+                <p class="text-sm text-slate-600">Есть ли отзывы, кейсы, сигналы доверия?</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">⚡</div>
+                <h3 class="font-bold">Современность</h3>
+                <p class="text-sm text-slate-600">Воспринимает ли AI продукт как современный?</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">🏁</div>
+                <h3 class="font-bold">Конкурентоспособность</h3>
+                <p class="text-sm text-slate-600">Кого AI рекомендует вместо вас?</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="text-2xl mb-2">⚠️</div>
+                <h3 class="font-bold">Hallucination Risk</h3>
+                <p class="text-sm text-slate-600">Какие ошибки AI распространяет о вас?</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== КОНКУРЕНТНЫЙ АНАЛИЗ (ТАБЛИЦА) ===== -->
+<section class="py-16 px-6 bg-slate-50">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">Сравнение AI-ассоциаций</h2>
+        <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Как ChatGPT и Claude позиционируют ваш бренд и конкурентов.
+            Вы увидите, какие ассоциации уже сформированы, а какие — отсутствуют.
+        </p>
+        <div class="table-wrap bg-white rounded-xl border border-slate-200 shadow-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ассоциация</th>
+                        <th>Ваш бренд</th>
+                        <th>Конкурент 1</th>
+                        <th>Конкурент 2</th>
+                        <th>Конкурент 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Cloud-first</td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Простота использования</td><td><span class="neutral-gray">—</span></td><td><span class="check-green">✓</span></td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Масштабируемость</td><td><span class="check-green">✓</span></td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Малый и средний бизнес</td><td><span class="neutral-gray">—</span></td><td><span class="check-green">✓</span></td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>ERP / Производство</td><td><span class="check-green">✓</span></td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td><td><span class="neutral-gray">—</span></td></tr>
+                    <tr><td>Локальный эксперт</td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Современный интерфейс</td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td><td><span class="neutral-gray">—</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Интеграции / API</td><td><span class="neutral-gray">—</span></td><td><span class="neutral-gray">—</span></td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td></tr>
+                    <tr><td>Отзывы / доверие</td><td><span class="cross-red">✕</span></td><td><span class="check-green">✓</span></td><td><span class="check-green">✓</span></td><td><span class="neutral-gray">—</span></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="text-xs text-slate-500 mt-3 text-center">
+            ✓ — сильная ассоциация &nbsp;·&nbsp; ✕ — отсутствует &nbsp;·&nbsp; — — нейтральная / слабая
+        </p>
+    </div>
+</section>
+
+<!-- ===== HALLUCINATION AUDIT ===== -->
+<section class="py-16 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">Hallucination Audit</h2>
+        <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Какие ошибки и неточности AI допускает о вашей компании.
+            Обычный пользователь не заметит этого — но это влияет на доверие.
+        </p>
+        <div class="bg-slate-50 rounded-2xl border border-slate-200 p-6 md:p-8">
+            <div class="hallucination-row">
+                <div><span class="label">AI считает</span><br /><span class="ai-says">«Ваш продукт интегрируется с PayPal»</span></div>
+                <div><span class="label">На самом деле</span><br /><span class="reality">Интеграция не подтверждена в официальных источниках</span></div>
+            </div>
+            <div class="hallucination-row">
+                <div><span class="label">AI считает</span><br /><span class="ai-says">«У вас есть синхронизация с банками в реальном времени»</span></div>
+                <div><span class="label">На самом деле</span><br /><span class="reality">В открытых источниках нет подтверждения этой функции</span></div>
+            </div>
+            <div class="hallucination-row">
+                <div><span class="label">AI считает</span><br /><span class="ai-says">«Пользователи на форумах рекомендуют вас как лучшее решение»</span></div>
+                <div><span class="label">На самом деле</span><br /><span class="reality">Значительных обсуждений на форумах не обнаружено</span></div>
+            </div>
+            <div class="hallucination-row">
+                <div><span class="label">AI считает</span><br /><span class="ai-says">«Конкурент современнее, потому что у него есть облако»</span></div>
+                <div><span class="label">На самом деле</span><br /><span class="reality">У вас также есть облачные версии, но AI об этом не знает</span></div>
+            </div>
+        </div>
+        <p class="text-sm text-slate-600 mt-4 text-center max-w-2xl mx-auto">
+            Мы фиксируем каждую такую ошибку и даём рекомендации,
+            как создать «Hallucination Shield» — контент, который AI будет использовать как достоверный источник.
+        </p>
+    </div>
+</section>
+
+<!-- ===== AI ASSOCIATION MAP ===== -->
+<section class="py-16 px-6 bg-slate-50">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">AI Association Map</h2>
+        <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Как AI воспринимает ваш бренд и конкурентов. Мы показываем,
+            какие ассоциации уже сформированы, а какие — критически отсутствуют.
+        </p>
+        <div class="association-grid">
+            <div class="association-card">
+                <h4>Ваш бренд</h4>
+                <ul>
+                    <li>Стабильность</li>
+                    <li>Локальный рынок</li>
+                    <li>Бухгалтерия</li>
+                    <li>Долгая история</li>
+                </ul>
+                <p class="text-xs text-red-500 mt-2 font-semibold">❌ Нет: cloud, modern, automation</p>
+            </div>
+            <div class="association-card">
+                <h4>Конкурент 1</h4>
+                <ul>
+                    <li>Cloud-first</li>
+                    <li>Простота старта</li>
+                    <li>Малый бизнес</li>
+                    <li>Современный интерфейс</li>
+                </ul>
+                <p class="text-xs text-green-600 mt-2 font-semibold">✓ Сильное позиционирование</p>
+            </div>
+            <div class="association-card">
+                <h4>Конкурент 2</h4>
+                <ul>
+                    <li>ERP</li>
+                    <li>Производство</li>
+                    <li>Масштабирование</li>
+                    <li>Корпоративный уровень</li>
+                </ul>
+                <p class="text-xs text-green-600 mt-2 font-semibold">✓ Сильное позиционирование</p>
+            </div>
+            <div class="association-card">
+                <h4>Конкурент 3</h4>
+                <ul>
+                    <li>Cloud</li>
+                    <li>Интеграции</li>
+                    <li>POS / Торговля</li>
+                    <li>Современная платформа</li>
+                </ul>
+                <p class="text-xs text-green-600 mt-2 font-semibold">✓ Сильное позиционирование</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== РЕКОМЕНДАЦИИ ===== -->
+<section class="py-16 px-6 bg-white">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">Рекомендации по улучшению</h2>
+        <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            На основе аудита мы даём конкретные шаги для повышения AI-видимости.
+            Это не общие советы, а приоритетный план на 30–60 дней.
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">📂</div>
+                <h3 class="font-bold">Category Ownership</h3>
+                <p class="text-sm text-slate-600">Создать контент, который AI будет использовать как источник знания о категории</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">📊</div>
+                <h3 class="font-bold">Competitive Positioning</h3>
+                <p class="text-sm text-slate-600">Структурированные сравнения с конкурентами для AI</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">🤝</div>
+                <h3 class="font-bold">Trust Signals</h3>
+                <p class="text-sm text-slate-600">Отзывы, кейсы, публичные упоминания</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">🛡️</div>
+                <h3 class="font-bold">Hallucination Shield</h3>
+                <p class="text-sm text-slate-600">Контент, который AI будет использовать как достоверный источник</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">⚡</div>
+                <h3 class="font-bold">Modern Positioning</h3>
+                <p class="text-sm text-slate-600">Подчеркнуть cloud, API, автоматизацию, цифровые процессы</p>
+            </div>
+            <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                <div class="pillar-icon">📈</div>
+                <h3 class="font-bold">Continuous Monitoring</h3>
+                <p class="text-sm text-slate-600">Повторный аудит через 30–60 дней для отслеживания прогресса</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ГОТОВЫЕ ШАБЛОНЫ ===== -->
+<section class="py-16 px-6 bg-slate-50">
+    <div class="max-w-5xl mx-auto">
+        <h2 class="section-title text-center mb-4">Готовые шаблоны контента</h2>
+        <p class="text-center text-slate-600 mb-10 max-w-2xl mx-auto">
+            Вместе с отчётом вы получаете готовые тексты,
+            которые можно сразу использовать на сайте.
+        </p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-card text-center">
+                <div class="text-3xl mb-2">📄</div>
+                <h4 class="font-bold text-sm">Категорийная страница</h4>
+                <p class="text-xs text-slate-500">Для запросов без упоминания бренда</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-card text-center">
+                <div class="text-3xl mb-2">⚖️</div>
+                <h4 class="font-bold text-sm">Сравнение с конкурентами</h4>
+                <p class="text-xs text-slate-500">Структурированные таблицы для AI</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-card text-center">
+                <div class="text-3xl mb-2">⭐</div>
+                <h4 class="font-bold text-sm">Страница отзывов</h4>
+                <p class="text-xs text-slate-500">Сигналы доверия для AI</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-card text-center">
+                <div class="text-3xl mb-2">🚀</div>
+                <h4 class="font-bold text-sm">Современные возможности</h4>
+                <p class="text-xs text-slate-500">Cloud, API, автоматизация</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ПОЧЕМУ ЭТО РАБОТАЕТ ===== -->
+<section class="py-16 px-6 bg-blue-900 text-white">
+    <div class="max-w-5xl mx-auto text-center">
+        <h2 class="text-3xl font-extrabold mb-4">
+            Вы не покупаете SEO.
+        </h2>
+        <p class="text-xl text-blue-200 max-w-3xl mx-auto">
+            Вы узнаёте, что AI думает о вашей компании
+            <span class="text-white font-bold">раньше ваших клиентов</span>.
+        </p>
+        <div class="mt-8 grid sm:grid-cols-3 gap-6 text-left">
+            <div class="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+                <div class="text-3xl mb-2">🧠</div>
+                <h4 class="font-bold">Что AI говорит</h4>
+                <p class="text-sm text-blue-200">Рекомендует, игнорирует или искажает информацию?</p>
+            </div>
+            <div class="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+                <div class="text-3xl mb-2">🎯</div>
+                <h4 class="font-bold">Кого AI рекомендует</h4>
+                <p class="text-sm text-blue-200">Какие компании получают клиентов вместо вас</p>
+            </div>
+            <div class="bg-white/10 p-6 rounded-xl backdrop-blur-sm">
+                <div class="text-3xl mb-2">🛡️</div>
+                <h4 class="font-bold">Как это исправить</h4>
+                <p class="text-sm text-blue-200">Конкретный план действий на 30–60 дней</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== ФИНАЛЬНЫЙ CTA ===== -->
+<section class="py-20 px-6 bg-white">
+    <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-extrabold mb-4">
+            Пилотный AI Visibility Audit
+        </h2>
+        <p class="text-lg text-slate-600 mb-6 max-w-2xl mx-auto">
+            15–20 страниц аналитики · 10+ пользовательских сценариев ·
+            сравнение с конкурентами · срок подготовки 48 часов
+        </p>
+        <div class="text-5xl font-black text-blue-600 mb-2">
+            99€
+        </div>
+        <p class="text-sm text-slate-500 mb-8">
+            Ручная работа эксперта · Без автоматической генерации
+        </p>
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=e.kate.taratuta@gmail.com&su=AI%20Visibility%20Audit%20Request"
+           target="_blank"
+           class="gradient-cta text-white px-10 py-5 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transition-all inline-block">
+            Получить AI Visibility Audit за 99€
+        </a>
+        <p class="text-sm text-slate-400 mt-4">
+            Заполните заявку, и мы свяжемся с вами в течение 2 часов
+        </p>
+    </div>
+</section>
+
+<!-- ===== ФУТЕР ===== -->
+<footer class="bg-slate-900 text-slate-400 py-8 px-6 text-center text-sm border-t border-slate-800">
+    <div class="max-w-5xl mx-auto">
+        <p class="font-medium text-white mb-2">Екатерина Таратута, PhD</p>
+        <p>Founding ML Engineer · AI Systems Builder · Business Analyst</p>
+        <div class="flex flex-wrap justify-center gap-4 mt-2">
+            <a href="https://www.linkedin.com/in/ekaterina-taratuta" target="_blank" class="footer-link">LinkedIn</a>
+            <a href="https://github.com/ETSystemsAI" target="_blank" class="footer-link">GitHub</a>
+            <a href="https://www.linkedin.com/company/111727786/" target="_blank" class="footer-link">ETSystemsAI</a>
+            <a href="https://www.linkedin.com/company/112245236/" target="_blank" class="footer-link">LLM Measurement Lab</a>
+        </div>
+        <p class="mt-4 text-xs text-slate-600">© 2026 ETSystemsAI. Все права защищены.</p>
+    </div>
+</footer>
 
 </body>
 </html>
